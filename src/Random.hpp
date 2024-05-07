@@ -16,7 +16,8 @@ public:
         INT,
         STRING,
         BOOL,
-        FLOAT
+        FLOAT,
+        ARRAY
     };
 
     RandJson(const nlohmann::json &req)
@@ -36,7 +37,7 @@ public:
 
     nlohmann::json GenTypedJson(const int num_key = 0);
 
-    nlohmann::json GetFullRandJson(const int num_key, const int nesting);
+    nlohmann::json GetFullRandJson(const int num_key, const int depth);
 
 private:
     void _InsertTemplate(const std::string &key, const nlohmann::json::value_type type);

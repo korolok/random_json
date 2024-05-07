@@ -33,12 +33,10 @@ nlohmann::json RandJson::GenUntypedJson(const int num_key)
 {
     std::random_device dev;
     std::mt19937 rng(dev());
-    std::uniform_int_distribution<std::mt19937::result_type> dist(0, 3);
+    std::uniform_int_distribution<std::mt19937::result_type> dist(0, 4);
 
     nlohmann::json resp;
     int count = 0;
-
-    nlohmann::json test = nlohmann::json::object();
 
     for (auto [key, type] : _template_json)
     {
@@ -63,9 +61,20 @@ nlohmann::json RandJson::GenUntypedJson(const int num_key)
     return resp;
 }
 
-nlohmann::json RandJson::GetFullRandJson(const int num_key, const int nesting)
+nlohmann::json RandJson::GetFullRandJson(const int num_key, const int depth)
 {
+    nlohmann::json resp;
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    std::uniform_int_distribution<std::mt19937::result_type> dist(0, 4);
 
+    for (int index = 0; index < num_key; ++index)
+    {
+        auto &it = resp[makeRandStr(5)];
+        _InsertData(it, Type(dist(rng)));
+    }
+
+    return resp;;
 }
 
 void RandJson::_InsertTemplate(const std::string &key, const nlohmann::json::value_type type)
@@ -74,26 +83,26 @@ void RandJson::_InsertTemplate(const std::string &key, const nlohmann::json::val
     {
     case nlohmann::json::value_t::boolean:
         _template_json.insert({key, BOOL});
-        std::cout << key << " BOOL" << std::endl;
         break;
 
     case nlohmann::json::value_t::number_integer:
         _template_json.insert({key, INT});
-        std::cout << key << " INT" << std::endl;
         break;
 
     case nlohmann::json::value_t::string:
         _template_json.insert({key, STRING});
-        std::cout << key << " STRING" << std::endl;
         break;
 
     case nlohmann::json::value_t::number_float:
         _template_json.insert({key, FLOAT});
-        std::cout << key << " FLOAT" << std::endl;
+        break;
+
+    case nlohmann::json::value_t::array:
+        _template_json.insert({key, ARRAY});
         break;
 
     default:
-        std::cout << "Fail type value" << std::endl;
+        std::cout << "Fail type value insert template" << std::endl;
         break;
     }
 }
@@ -105,37 +114,92 @@ void RandJson::_InsertData(nlohmann::json &key, const Type type)
 
     switch (type)
     {
-        case BOOL:
+    case BOOL:
+    {
+        std::uniform_int_distribution<std::mt19937::result_type> dis(0, 1);
+        key = bool(dis(rng));
+        break;
+    }
+
+    case INT:
+    {
+        std::uniform_int_distribution<std::mt19937::result_type> dis(0, 10000);
+        key = dis(rng);
+        break;
+    }
+
+    case STRING:
+    {
+        key = makeRandStr(9);
+        break;
+    }
+
+    case FLOAT:
+    {
+        std::uniform_real_distribution<float> dis(0, 5);
+        key = dis(rng);
+        break;
+    }
+
+    case ARRAY:
+    {
+        std::vector<std::string> str;
+        for (int i = 0; i < 3; ++i)
         {
-            std::uniform_int_distribution<std::mt19937::result_type> dis(0, 1);
-            key = bool(dis(rng));
-            break;
+            str.push_back(makeRandStr(9));
         }
 
-        case INT:
-        {
-            std::uniform_int_distribution<std::mt19937::result_type> dis(0, 10000);
-            key = dis(rng);
-            break;
-        }
+        key = str;
+        break;
+    }
 
-        case STRING:
-        {
-            key = makeRandStr(9);
-            break;
-        }
 
-        case FLOAT:
-        {
-            std::uniform_real_distribution<float> dis(0, 5);
-            key = dis(rng);
-            break;
-        }
-
-        default:
-        {
-            std::cout << "Fail type value" << std::endl;
-            break;
-        }
+    default:
+    {
+        std::cout << "Fail" << std::endl;
+        break;
+    }
     }
 }
+
+// void RandJson::_AssignKeyValuePairToJson(nlohmann::json &t, Type type, int jsonDepth)
+// {
+//     std::random_device dev;
+//     std::mt19937 rng(dev());
+
+//     switch (type)
+//     {
+//     case BOOL:
+//     {
+//         std::uniform_int_distribution<std::mt19937::result_type> dis(0, 1);
+//         t[makeRandStr(5)] = bool(dis(rng));
+//         break;
+//     }
+
+//     case INT:
+//     {
+//         std::uniform_int_distribution<std::mt19937::result_type> dis(0, 10000);
+//         t[makeRandStr(5)] = dis(rng);
+//         break;
+//     }
+
+//     case STRING:
+//     {
+//         t[makeRandStr(5)] = makeRandStr(9);
+//         break;
+//     }
+
+//     case FLOAT:
+//     {
+//         std::uniform_real_distribution<float> dis(0, 5);
+//         t[makeRandStr(5)] = dis(rng);
+//         break;
+//     }
+
+//     default:
+//     {
+//         t[makeRandStr(5)] = GetFullRandJson(jsonDepth + 1);
+//         break;
+//     }
+//     }
+// }

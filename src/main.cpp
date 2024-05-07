@@ -1,5 +1,4 @@
 #include <iostream>
-#include "json.hpp"
 #include "Random.hpp"
 
 int main()
@@ -12,19 +11,26 @@ int main()
         {"date",   158.2}
     };
 
-    test["aboba"] = {
-        {"name", "hui"},
-        {"comment", "aboba"}
+    test["basic"] = {
+        {"name", "worker"},
+        {"comment", "Cleaner"},
+        {"array", {"arr", "abo"}}
     };
 
-    std::shared_ptr<RandJson> rand_tuple = std::make_shared<RandJson>(test);
+    std::unordered_map<std::string, std::shared_ptr<RandJson>> templates;
 
-    // auto resp = rand_tuple->GenTypedJson();
+    {
+        auto temp = std::make_shared<RandJson>(test);
+        templates["worker"] = temp;
+    }
 
-    auto resp = rand_tuple->GenUntypedJson();
+    auto typed = templates["worker"]->GenTypedJson();
+    // auto untyped = templates["worker"]->GenUntypedJson();
+    // auto random = templates["worker"]->GetFullRandJson(4, 3);
 
-
-    std::cout << resp.dump(3) << std::endl;
+    std::cout << typed.dump(3) << std::endl;
+    // std::cout << untyped.dump(3) << std::endl;
+    // std::cout << random.dump(3) << std::endl;
 
     return 0;
 }
